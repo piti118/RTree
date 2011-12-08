@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #include <algorithm>
-
+#include <vector>
 #define ASSERT assert // RTree uses ASSERT( condition )
 #ifndef Min
   #define Min std::min
@@ -79,7 +79,7 @@ public:
   /// \param a_max Max of bounding rect
   /// \param a_dataId Positive Id of data.  Maybe zero, but negative numbers not allowed.
   void Insert(const ELEMTYPE a_min[NUMDIMS], const ELEMTYPE a_max[NUMDIMS], const DATATYPE& a_dataId);
-  
+  void InsertPoint(const ELEMTYPE a_min[NUMDIMS], const DATATYPE& a_dataId){Insert(a_min,a_min,a_dataId);}
   /// Remove entry
   /// \param a_min Min of bounding rect
   /// \param a_max Max of bounding rect
@@ -94,7 +94,20 @@ public:
   /// \param a_context User context to pass as parameter to a_resultCallback
   /// \return Returns the number of entries found
   int Search(const ELEMTYPE a_min[NUMDIMS], const ELEMTYPE a_max[NUMDIMS], t_resultCallback a_resultCallback, void* a_context);
-  
+  static bool append_ret(DATATYPE d,void* v){
+      using namespace std;
+      vector<DATATYPE>* vec = (vector<DATATYPE>*)(v);
+      vec->push_back(d);
+      return true;
+  };
+  std::vector<DATATYPE> Find(const ELEMTYPE a_min[NUMDIMS], const ELEMTYPE a_max[NUMDIMS]){
+      using namespace std;
+      vector<DATATYPE> ret;
+      Search(a_min,a_max,this->append_ret,(void*)&ret);
+      return ret;
+  }
+
+
   /// Remove all entries from tree
   void RemoveAll();
 
